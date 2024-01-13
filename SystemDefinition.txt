@@ -1,0 +1,20 @@
+Buisness Requirements
+
+1.The application will enable user authentication and authorization for different types of users.
+2.The application will serve as the backend of a web app, delivering information to the frontend.
+3.The application will utilize a MySQL database for data retention.
+4.The database will include entities for users, posts, trainings containing exercises, comments on posts, and orders consisting of trainings.
+5.The application will NOT implement logic for a payment service for orders.
+6.The application will allow admin users to control what is publicly available to all users.
+7.The application will support CRUD operations on the entities.
+8.The application will feature user engagement tools such as like and dislike options.
+9.The application will ensure the validity of data provided in requests.
+10.The application will guarantee that only users with appropriate permissions can add posts, trainings, and exercises to the platform.
+
+MVP
+
+1. The application will have user authentication and authorization. There will be three types of user roles: ADMIN, TRAINER, and USER. Passwords will be encrypted when saved to the database. Authentication will use JWT.
+2. The application will allow TRAINERS to create, update and delete their personal posts, trainings, and exercises. The ADMIN will be able to delete others' items aswell.
+3. The application will enable USERS to view only those posts, trainings, and exercises that are approved by an ADMIN.
+4. The application will allow the ADMIN to view any post, training, or exercise and also permit them to approve these items.
+5. The application will enable the ADMIN to assign a USER the role of TRAINER.

@@ -1,0 +1,32 @@
+services:
+  app:
+    container_name: app
+    build: .
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - db
+    networks:
+      - wellness-spring
+
+  db:
+    container_name: db
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: 'proiect_java'
+      MYSQL_USER: 'docker_user'
+      MYSQL_PASSWORD: '1234'
+      MYSQL_ROOT_PASSWORD: '1234'
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - wellness-spring
+
+volumes:
+  db-data:
+networks:
+  wellness-spring:
+    driver: bridge

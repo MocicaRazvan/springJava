@@ -11,14 +11,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,7 +47,16 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(
             @Valid @RequestBody RegisterRequest registerRequest
     ) {
-        return ResponseEntity.ok(authService.register(registerRequest));
+//        AuthResponse resp = authService.register(registerRequest);
+//
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.SET_COOKIE, createCookie(resp.getToken()).toString())
+//                .body(authService.register(registerRequest));
+        return authService.register(registerRequest)
+                .map(authResponse -> ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, createCookie(authResponse.getToken()).toString())
+                        .body(authResponse));
+
     }
 
     @Operation(summary = "Login an existing user",
@@ -61,6 +75,21 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest loginRequest
     ) {
-        return ResponseEntity.ok(authService.login(loginRequest));
+//        return ResponseEntity.ok(authService.login(loginRequest));
+        return authService.login(loginRequest)
+                .map(authResponse -> ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, createCookie(authResponse.getToken()).toString())
+                        .body(authResponse));
+
     }
+
+    private ResponseCookie createCookie(String token) {
+        return ResponseCookie.from("authToken", token)
+                .httpOnly(true)
+                .maxAge(Duration.ofDays(1))
+//                .secure(secure)
+                .path("/")
+                .build();
+    }
+
 }

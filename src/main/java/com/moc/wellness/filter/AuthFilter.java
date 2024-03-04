@@ -6,9 +6,11 @@ import com.moc.wellness.utils.jwt.JwtUtils;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
@@ -56,13 +59,20 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
         try {
+            final String authCookie = request.getCookies() != null ? Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals("authToken"))
+                    .findFirst().map(Cookie::getValue).
+                    orElse(null)
+                    : null;
+
             final String authHeader = request.getHeader("Authorization");
 
 
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if ((authHeader == null || !authHeader.startsWith("Bearer ")) && authCookie == null) {
                 throw new TokenNotFound();
             }
-            final String jwt = authHeader.substring(7);
+
+            final String jwt = authHeader != null ? authHeader.substring(7) : authCookie;
             System.out.println(jwt);
             final String email = jwtUtils.extractUsername(jwt);
             System.out.println(email);
